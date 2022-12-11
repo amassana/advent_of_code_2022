@@ -1,0 +1,20 @@
+Day6:
+
+WindowedSequence -> iterar amb una finestra
+indexOfFirst { BooleanExpression }
+all { BooleanExpression } // all satisfy - if one does not, it stops
+
+
+Day 7:
+
+removePrefix instead of substring(0, 4)
+
+val milion = 1_000_000
+
+------
+
+Day 9
+
+list.zipWithNext() (a, b, c, d) -> ((a, b), (b, c), (c, d))
+coerceIn (range?) -> forçar valor
+
