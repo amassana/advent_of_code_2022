@@ -18,3 +18,27 @@ Day 9
 list.zipWithNext() (a, b, c, d) -> ((a, b), (b, c), (c, d))
 coerceIn (range?) -> forçar valor
 
+--
+
+Day10
+
+subStringAfter(" ") // end of the string ..
+"""
+  asdfasdf
+  asdfasdf
+""".trimIndent()
+
+val (a, b) = split(" ")
+
+----
+
+Day 11
+list.drop(1) // treure el primer
+
+toIntOrNull() ?: "default"
+
+multiply list of ints: reduce(Int::times)
+
+
+
+

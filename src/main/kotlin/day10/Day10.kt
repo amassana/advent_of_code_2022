@@ -49,7 +49,8 @@ class CPU {
     }
 
     private fun draw() {
-        if (register == (cycle - 1) % 40 || register == (cycle - 1) % 40 - 1 || register == (cycle - 1) % 40 + 1)
+        //if (register == (cycle - 1) % 40 || register == (cycle - 1) % 40 - 1 || register == (cycle - 1) % 40 + 1)
+        if (register in (cycle - 1) % 40 - 1 .. (cycle - 1) % 40 + 1)
             screen += "#"
         else
             screen += " "

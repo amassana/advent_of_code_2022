@@ -29,19 +29,41 @@ data class Item(val worry: Int)
 data class Monkey(
     val id: String,
     var items: MutableList<Item>,
-    val worryLevelUpdate: (Int) -> Long,
-    val nextMonkey: (Int) -> String,
-    val divisibleBy: Int,
+    private val worryLevelUpdate: (Int) -> Long,
+    val divisor: Int,
+    private val monkeyWhenTrue: String,
+    private val monkeyWhenFalse: String,
 ) {
+    var modulo: Int? = null
     var inspectCounter: Int = 0
-
-    fun addItem(item: Item) {
-        items.add(item)
-    }
 
     fun printInspection() {
         println("Monkey $id inspected items $inspectCounter times.")
     }
+
+    fun inspect(): List<Pair<String, List<Item>>> {
+        val whenTrueItems = mutableListOf<Item>()
+        val whenFalseItems = mutableListOf<Item>()
+
+        while (items.isNotEmpty()) {
+            var item = items.removeFirst()
+
+            inspectCounter ++
+
+            val newWorry = (worryLevelUpdate(item.worry) % modulo!!).toInt()
+
+            if (newWorry isDivisibleBy divisor)
+                whenTrueItems += Item(newWorry)
+            else
+                whenFalseItems += Item(newWorry)
+        }
+
+        return listOf(
+            monkeyWhenTrue to whenTrueItems,
+            monkeyWhenFalse to whenFalseItems
+        )
+    }
+    private infix fun Int.isDivisibleBy(divisor: Int): Boolean = this % divisor == 0
 
     companion object {
         fun of(monkeyDefinition: List<String>): Monkey {
@@ -59,54 +81,46 @@ data class Monkey(
             val worryLevelUpdate = monkeyDefinition[2]
                 .removePrefix("  Operation: new = old ")
                 .let {
-                    val operationDefinition = it.split(" ")
-                    if (operationDefinition[0] == "*") {
-                        if (operationDefinition[1] == "old")
+                    val (operation, operand) = it.split(" ")
+                    if (operation == "*") {
+                        if (operand == "old")
                             return@let { i: Int -> (i.toLong() * i)  }
-                        return@let { i: Int -> i * operationDefinition[1].toLong() }
+                        return@let { i: Int -> i * operand.toLong() }
                     }
-                    return@let { i: Int -> (i + operationDefinition[1].toLong()) }
+                    return@let { i: Int -> (i + operand.toLong()) }
                 }
 
             val divisibleBy = monkeyDefinition[3]
-                .removePrefix("  Test: divisible by ")
+                .substringAfterLast(" ") // Test: divisible by x
                 .toInt()
             val whenTrue = monkeyDefinition[4]
-                .removePrefix("    If true: throw to monkey ")
+                .substringAfterLast(" ")  // If true: throw to monkey x
             val whenFalse = monkeyDefinition[5]
-                .removePrefix("    If false: throw to monkey ")
-            val nextMonkey = { worryLevel: Int ->
-                // TODO how to return ...
-                if (worryLevel % divisibleBy == 0)
-                    whenTrue
-                else whenFalse
-            }
+                .substringAfterLast(" ")  // If false: throw to monkey x
 
-            return Monkey(id, initialItems, worryLevelUpdate, nextMonkey, divisibleBy)
+            return Monkey(id, initialItems, worryLevelUpdate, divisibleBy, whenTrue, whenFalse)
         }
     }
 }
 
 
+
 data class Zoo(val monkeys: List<Monkey>) {
 
     private var modulo: Int = monkeys
-        .map { it.divisibleBy }
-        .reduce { x, y -> x * y}
+        .map { it.divisor }
+        .reduce (Int::times)
+
+    init {
+        monkeys.forEach { it.modulo = modulo }
+    }
 
     fun round() {
         monkeys.forEach { monkey ->
-            val mutableIterator = monkey.items.iterator()
-            for (item in mutableIterator) {
-                monkey.inspectCounter ++
+            val result = monkey.inspect()
 
-                val newWorry = (monkey.worryLevelUpdate(item.worry) % modulo).toInt()
-
-                val nextMonkey = monkey.nextMonkey(newWorry).toInt()
-
-                monkeys[nextMonkey].addItem(Item(newWorry))
-
-                mutableIterator.remove()
+            for ((destMonkey, items) in result) {
+                monkeys[destMonkey.toInt()].items += items
             }
         }
     }
