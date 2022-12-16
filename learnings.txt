@@ -39,6 +39,15 @@ toIntOrNull() ?: "default"
 
 multiply list of ints: reduce(Int::times)
 
+Context(Interface)
+fun A() { ... using the interface ... }
 
+with (Implementation) {
+    A()
+}
 
+---
 
+Day 13
+
+str.removeSorrounding

@@ -74,7 +74,6 @@ data class Monkey(
             val initialItems = monkeyDefinition[1]
                 .removePrefix("  Starting items: ")
                 .split(", ")
-                .toList()
                 .map { Item(it.toInt()) }
                 .toMutableList()
 
