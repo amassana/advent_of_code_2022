@@ -1,7 +1,6 @@
 package day15
 
 import java.io.File
-import java.time.LocalDateTime
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -11,35 +10,33 @@ fun main() {
         .map { Reading.of(it) }
         .toList()
 
-    println("S ${LocalDateTime.now()}")
     part2(data, 4_000_000)
-    println("E ${LocalDateTime.now()}")
 
     //part1(data, 2000000)
 }
 
 fun part2(data: List<Reading>, max: Int) {
     val matrix = mutableListOf<List<IntRange>>()
-    println("D1 ${LocalDateTime.now()}")
+
     for(line in 0..max) {
-        matrix += fuse(data, line)
+        matrix += lineCoverage(data, line)
     }
-    println("X ${LocalDateTime.now()}")
+
     for (line in 0..max) {
         val ranges = matrix[line]
-        if (ranges.size == 1 && ranges[0].first < 0 && ranges[0].last > max) // can't be a candidate, skip
+        if (ranges.size == 1 && ranges[0].first < 0 && ranges[0].last > max) // _the_ time saver: can't be a candidate, skip
             continue
         for (x in 0..max) {
             if (ranges.none { x in it } ) {
-                println("$line $x ${x*4000000L + line}")
+                println("$line $x ${x*4000000L + line}") // the response ^^'
                 return
             }
         }
-        if (line % 10_000 == 0) println("${LocalDateTime.now()} $line")
     }
 }
 
-fun fuse(data: List<Reading>, line: Int): List<IntRange> {
+// (list of) ranges that are covered by the sensors in the given line
+fun lineCoverage(data: List<Reading>, line: Int): List<IntRange> {
     var ranges = data.map { reading ->
         val range = reading.rangeInLine(line)
         if (range == IntRange.EMPTY) {
@@ -58,7 +55,7 @@ fun fuse(data: List<Reading>, line: Int): List<IntRange> {
 }
 
 fun part1(data: List<Reading>, line: Int) {
-    val ranges = fuse(data, line)
+    val ranges = lineCoverage(data, line)
 
     val occupiedPositions =
         (data.map { it.beaconX to it.beaconY } + data.map { it.sensorX to it.sensorY }).distinct()
@@ -77,24 +74,29 @@ fun part1(data: List<Reading>, line: Int) {
     println(final)
 }
 
+/*
+    Tries to simplify the list of ranges by finding out ranges that overlap and merging them
+ */
 private fun merge(ranges: List<IntRange>): List<IntRange> {
+    // find a candidate, merge and return. Otherwise, search for another candidate.
     for (range in ranges) {
-        var newRange = range
-        var newList = mutableListOf<IntRange>()
+        var newRange = range // candidate
+        var newList = mutableListOf<IntRange>() // new ranges list if we could merge
         for (test in ranges) {
-            if (newRange == test)
+            if (newRange == test) // skip myself or equivalents to me
                 continue
-            if (newRange.canBeMerged(test)) {
+            if (newRange.canBeMerged(test)) { // merge the ranges
                 newRange = newRange.merge(test)
             }
-            else {
+            else { // the tested range can't be merged. push to the list
                 newList += test
             }
         }
-        if (newRange == range)
+        if (newRange == range) // no change was made. Let's try another candidate.
             continue
 
-        newList.add(newRange)
+        newList.add(newRange) // changes were mede. Add the larger built range and return
+
         return newList
     }
 
@@ -116,6 +118,9 @@ private val IntRange.length: Int
 class Reading(val sensorX: Int, val sensorY: Int, val beaconX: Int, val beaconY: Int) {
     private val distance = abs(sensorX - beaconX) + abs(sensorY - beaconY)
 
+    /*
+        Returns the range of scanned positions by this sensor-beacon pair. Might be EMPTY
+     */
     fun rangeInLine(y: Int): IntRange {
         val yDistance = abs(y - sensorY)
         if (yDistance > distance)
@@ -125,11 +130,11 @@ class Reading(val sensorX: Int, val sensorY: Int, val beaconX: Int, val beaconY:
         return (a..b)
     }
 
+    fun contains(x: Int, y: Int): Boolean = abs(sensorY - y) + abs(sensorX - x) <= distance
+
     override fun toString(): String {
         return "Sensor($sensorX, $sensorY) Beacon($beaconX, $beaconY)"
     }
-
-    fun contains(x: Int, y: Int): Boolean = abs(sensorY - y) + abs(sensorX - x) <= distance
 
     companion object {
         fun of(s: String): Reading {/*
