@@ -1,6 +1,7 @@
 package day15
 
 import java.io.File
+import java.time.LocalDateTime
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -16,22 +17,20 @@ fun main() {
 }
 
 fun part2(data: List<Reading>, max: Int) {
-    val matrix = mutableListOf<List<IntRange>>()
-
-    for(line in 0..max) {
-        matrix += lineCoverage(data, line)
-    }
+    println("${LocalDateTime.now()}")
 
     for (line in 0..max) {
-        val ranges = matrix[line]
+        val ranges =  lineCoverage(data, line)
         if (ranges.size == 1 && ranges[0].first < 0 && ranges[0].last > max) // _the_ time saver: can't be a candidate, skip
             continue
         for (x in 0..max) {
             if (ranges.none { x in it } ) {
                 println("$line $x ${x*4000000L + line}") // the response ^^'
+                println("${LocalDateTime.now()}")
                 return
             }
         }
+        println("This is never printed")
     }
 }
 

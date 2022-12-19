@@ -1,0 +1,7 @@
+2022-12-18T10:02:07.752812800 START
+
+2022-12-18T10:05:24.644151100 END
+
+[Move to RO, Move to TC, Move to KU, Open KU, Move to TF, Move to FR, Open FR, Move to ZK, Move to ER, Move to QO, Open QO, Move to MF, Move to GQ, Move to VD, Open VD, Move to TR, Move to AJ, Open AJ, Move to QX, Move to CG, Open CG, Move to FF, Move to ZL, Move to WI, Open WI, Move to ZJ, Move to GJ, Open GJ, Move to TG, Move to AX]
+
+which gives 1792
