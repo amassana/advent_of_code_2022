@@ -181,10 +181,10 @@ class State(val matrix: Array<Array<Cell>>) {
                     if (colIndex == 0 || colIndex == numCols - 1)
                         newRow[colIndex] = cell
                     else {
-                        val cellUp = if (rowIndex == 1) matrix[numRows - 2]!![colIndex] else matrix[rowIndex - 1]!![colIndex]
-                        val cellDown = if (rowIndex == numRows - 2) matrix[1]!![colIndex] else matrix[rowIndex + 1]!![colIndex]
-                        val cellLeft = if (colIndex == 1) matrix[rowIndex]!![numCols - 2] else matrix[rowIndex]!![colIndex - 1]
-                        val cellRight = if (colIndex == numCols - 2) matrix[rowIndex]!![1] else matrix[rowIndex]!![colIndex + 1]
+                        val cellUp = if (rowIndex == 1) matrix[numRows - 2][colIndex] else matrix[rowIndex - 1][colIndex]
+                        val cellDown = if (rowIndex == numRows - 2) matrix[1][colIndex] else matrix[rowIndex + 1][colIndex]
+                        val cellLeft = if (colIndex == 1) matrix[rowIndex][numCols - 2] else matrix[rowIndex][colIndex - 1]
+                        val cellRight = if (colIndex == numCols - 2) matrix[rowIndex][1] else matrix[rowIndex][colIndex + 1]
                         newRow[colIndex] = Cell(cellDown.hasUp, cellUp.hasDown, cellRight.hasLeft, cellLeft.hasRight, false)
                     }
                 }

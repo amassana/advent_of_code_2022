@@ -6,7 +6,7 @@ import kotlin.collections.ArrayDeque
 fun main() {
     val lines = File("files/day23/input.txt").inputStream().bufferedReader().readLines()
 
-    var grove: Grove = Grove()
+    var grove = Grove()
 
     lines.forEachIndexed { rowIndex, row ->
         row.forEachIndexed { colIndex, char ->
@@ -37,6 +37,7 @@ fun main() {
 }
 
 class Grove {
+    // storing only positions as a set of elfs and removing the elfs list has a very poor performance ++ Elf() instances
     private var elfs = mutableListOf<Elf>()
     private var positions = mutableSetOf<Pair<Int, Int>>()
 
@@ -45,7 +46,7 @@ class Grove {
     private var maxRow: Int = Int.MIN_VALUE
     private var maxCol: Int = Int.MIN_VALUE
 
-    fun needsToMove(elf: Elf) =
+    private fun needsToMove(elf: Elf) =
         positions.contains(elf.row - 1 to elf.col)
                 || positions.contains(elf.row - 1 to elf.col + 1)
                 || positions.contains(elf.row to elf.col + 1)
@@ -66,6 +67,7 @@ class Grove {
         maxCol = maxCol.coerceAtLeast(elf.col)
     }
 
+    // returns the next layout after the elfs choose where they can move - or null if elfs are in their final position
     fun next(): Grove? {
         val grove = Grove()
 
@@ -109,7 +111,7 @@ class Grove {
         cantMove.forEach { grove.addElf(it) }
         willMove.forEach { grove.addElf(it) }
 
-        rotate()
+        rotateMovements()
 
         return grove
     }
@@ -158,18 +160,18 @@ class Grove {
         // list of higher order functions that will be invoked, in the current applicable order
         val movements = ArrayDeque(listOf(tryNorth, trySouth, tryWest, tryEast))
 
-        // rotate the election functions
-        fun rotate() {
+        // rotate the movement functions
+        fun rotateMovements() {
             val f = movements.removeFirst()
             movements.addLast(f)
         }
     }
 }
 
-class Candidates() {
+class Candidates {
     // list of candidates for each position.
     // stores both source (in case no elf can move) and target (in case the elf can move)
-    val candidates = mutableMapOf<Pair<Int, Int>, MutableList<Pair<Elf, Elf>>>()
+    private val candidates = mutableMapOf<Pair<Int, Int>, MutableList<Pair<Elf, Elf>>>()
 
     fun values() = candidates.values
 
